@@ -33,9 +33,11 @@ const Home = () => {
         queryFn: async () => {
             if (!user?.email) return [];
             const res = await axiosPublic.get('/tasks', {
-                params: { email: user.email }
+                params: { email: user?.email }
             });
+            // setStores(allTasks);
             return res.data;
+            
         },
         enabled: !!user?.email,
     });
@@ -63,11 +65,16 @@ const Home = () => {
         openModal();
     };
 
-    const handleEdit = async (data) => {
+    const handleEdit = async (e) => {
+        e.preventDefault();
+        const form = e.target;
+        const title = form.title.value;
+        const description = form.description.value;
         const updatedTask = {
-            title: data.title,
-            description: data.description,
+            title: title,
+            description: description
         };
+        console.log(updatedTask)
 
         try {
             const taskRes = await axiosPublic.patch(`/tasks/${editTask._id}`, updatedTask);
@@ -86,6 +93,7 @@ const Home = () => {
 
     // Post a new task
     const handleTaskSubmit = async (data) => {
+        console.log(data)
         try {
             const taskInfo = {
                 title: data.title,
@@ -94,12 +102,18 @@ const Home = () => {
                 postedTime: Date.now(),
                 email: user.email
             };
-
+    
+            console.log("Form Data:", taskInfo); // Debugging
+    
             const taskRes = await axiosPublic.post('/tasks', taskInfo);
+            console.log("Backend Response:", taskRes); // Debugging
+    
             if (taskRes.data.insertedId) {
                 toast.success("Task Submission Successful");
-                refetch(); // Refetch tasks to update the UI
-                reset(); // Reset the form
+                refetch().then(()=>{
+                    reset(); 
+                }); 
+                
             } else {
                 toast.error("Something went wrong!");
             }
@@ -345,21 +359,17 @@ const Home = () => {
             <dialog id="addTask" className="modal" aria-modal="true">
                 <div className="modal-box">
                     <h3 className="font-bold text-xl text-center">Edit Your Task</h3>
-                    <form onSubmit={handleSubmit(handleEdit)} className="w-full space-y-4">
+                    <form onSubmit={handleEdit} className="w-full space-y-4">
                         {/* Title Field */}
                         <div>
                             <label className="block">Title</label>
                             <input
                                 type="text"
+                                name="title"
                                 placeholder="Enter title"
                                 defaultValue={editTask.title}
-                                {...register('title', {
-                                    required: "Title is required",
-                                    maxLength: { value: 50, message: "Title cannot exceed 50 characters" }
-                                })}
                                 className="input input-bordered w-full"
                             />
-                            {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
                         </div>
 
                         {/* Description Field */}
@@ -367,14 +377,10 @@ const Home = () => {
                             <label className="block">Description</label>
                             <textarea
                                 placeholder="Enter description"
+                                name="description"
                                 defaultValue={editTask.description}
-                                {...register('description', {
-                                    required: "Description is required",
-                                    maxLength: { value: 200, message: "Description cannot exceed 200 characters" }
-                                })}
                                 className="textarea w-full"
                             />
-                            {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
                         </div>
 
                         <button type="submit" className="btn btn-sm border border-green-500 mt-1 text-green-700">Update Task</button>
