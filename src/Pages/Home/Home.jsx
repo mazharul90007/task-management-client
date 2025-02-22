@@ -209,7 +209,7 @@ const Home = () => {
                                 </div>
 
                                 {/* Create a Task */}
-                                <div className="w-11/12 mx-auto">
+                                <div className="">
                                     <form onSubmit={handleSubmit(handleTaskSubmit)} className="w-full flex flex-col md:flex-row items-start md:items-center gap-2">
                                         {/* Title */}
                                         <div className="flex items-center gap-1 w-full">
@@ -259,7 +259,7 @@ const Home = () => {
 
                             <div>
                                 {/* Task Container */}
-                                <div className="w-11/12 mx-auto">
+                                <div className="">
 
                                     <div className="grid md:grid-cols-3 gap-2 mt-16 h-full">
                                         {/* To Do Column */}
