@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MdDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Home = () => {
@@ -20,7 +20,7 @@ const Home = () => {
 
 
     // Get data based on email
-    const { data: allTasks = [], refetch } = useQuery({
+    const { refetch } = useQuery({
         queryKey: ["allTasks", user?.email],
         queryFn: async () => {
             if (!user?.email) return [];
@@ -201,18 +201,18 @@ const Home = () => {
 
                     {user?.email ?
 
-                        <div>
+                        <div className="mt-16">
                             {/* Description */}
                             <div>
-                                <div className="text-center">
+                                <div className="text-center mb-4">
                                     <h3 className="text-3xl font-semibold text-teal-600">Your Daily Task</h3>
                                 </div>
 
                                 {/* Create a Task */}
                                 <div className="w-11/12 mx-auto">
-                                    <form onSubmit={handleSubmit(handleTaskSubmit)} className="w-full flex items-center gap-2">
+                                    <form onSubmit={handleSubmit(handleTaskSubmit)} className="w-full flex flex-col md:flex-row items-start md:items-center gap-2">
                                         {/* Title */}
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-1 w-full">
                                             <label className="block">Title</label>
                                             <input
                                                 type="text"
@@ -227,7 +227,7 @@ const Home = () => {
                                         </div>
 
                                         {/* Description */}
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-1 w-full">
                                             <label className="block">Description</label>
                                             <input
                                                 type="text"
@@ -242,7 +242,7 @@ const Home = () => {
                                         </div>
 
                                         {/* Category */}
-                                        <div className="flex items-center gap-1">
+                                        <div className="flex items-center gap-1 w-full">
                                             <label className="block">Category</label>
                                             <select defaultValue='default' {...register('category', { required: true })} className="select select-bordered w-full">
                                                 <option disabled value="default">Category</option>
@@ -252,7 +252,7 @@ const Home = () => {
                                             </select>
                                         </div>
 
-                                        <button className="btn btn-sm border border-green-500 text-green-700">Post</button>
+                                        <button className="btn btn-sm border border-green-500 text-green-700">Add Task</button>
                                     </form>
                                 </div>
                             </div>
