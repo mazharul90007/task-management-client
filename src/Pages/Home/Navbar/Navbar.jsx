@@ -3,7 +3,7 @@ import { MdOutlineLogout } from "react-icons/md";
 import useAuth from "../../../Hooks/useAuth";
 
 const Navbar = () => {
-    const { user, setUser, logOut } = useAuth();
+    const { setUser, logOut } = useAuth();
 
     //Logout User
     const handleLogOut = () => {

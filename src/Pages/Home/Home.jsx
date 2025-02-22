@@ -54,6 +54,7 @@ const Home = () => {
     };
 
     const handleEditButton = (task) => {
+        console.log(task)
         setEditTask(task);
         openModal();
     };
@@ -67,7 +68,7 @@ const Home = () => {
             title: title,
             description: description
         };
-        // console.log(updatedTask)
+        console.log(updatedTask)
 
         try {
             const taskRes = await axiosPublic.patch(`/tasks/${editTask._id}`, updatedTask);
@@ -148,9 +149,9 @@ const Home = () => {
 
     const handleDragDrop = async (results) => {
         const { source, destination, draggableId } = results;
-        console.log(results)
+        // console.log(results)
 
-        // If there's no destination or task is dropped in the same position, do nothing
+
         if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
 
         // Clone stores to avoid modifying state directly
@@ -158,7 +159,7 @@ const Home = () => {
 
         // Find the task being moved
         const task = reorderedStores.find((task) => task._id === draggableId);
-        if (!task) return; // Prevent errors if the task is not found
+        if (!task) return;
 
         if (source.droppableId === destination.droppableId) {
             // Reorder tasks within the same column
@@ -184,7 +185,7 @@ const Home = () => {
             // Update the task in the database
             try {
                 await axiosPublic.patch(`/tasks/category/${task._id}`, { category: destination.droppableId });
-                refetch(); // Refetch tasks to ensure the UI is up-to-date
+                refetch();
             } catch (error) {
                 console.error("Failed to update task category:", error);
             }
@@ -197,6 +198,7 @@ const Home = () => {
             <DragDropContext onDragEnd={handleDragDrop}>
                 {/* Display Card Section */}
                 <div className="w-11/12 mx-auto">
+
                     {user?.email ?
 
                         <div>
@@ -263,12 +265,12 @@ const Home = () => {
                                         {/* To Do Column */}
                                         <Droppable droppableId="todo" type="group">
                                             {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-red-400 h-full">
-                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b">Task to Do</h2>
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 h-full bg-blue-100 p-2">
+                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b mb-2 text-teal-600">Task to Do</h2>
                                                     {todoTasks.map((task, index) => (
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                                             {(provided) => (
-                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
+                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200 bg-blue-50 rounded-md">
                                                                     <div className="flex items-center justify-end gap-0.5">
                                                                         <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
                                                                             <MdDelete />
@@ -277,8 +279,11 @@ const Home = () => {
                                                                             <FaRegEdit />
                                                                         </button>
                                                                     </div>
-                                                                    <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                                    <p className="text-sm text-gray-500">{task.description}</p>
+                                                                    <div>
+                                                                        <h2 className="text-lg font-semibold">{task.title}</h2>
+                                                                        <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+                                                                        <p className=" text-xs text-gray-400 font-semibold mt-auto italic">Uploaded: {new Date(task.postedTime).toLocaleString()}</p>
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </Draggable>
@@ -291,12 +296,12 @@ const Home = () => {
                                         {/* In Progress Column */}
                                         <Droppable droppableId="inProgress" type="group">
                                             {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-yellow-400 h-full">
-                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b">Task In Progress</h2>
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 bg-blue-100 h-full shadow p-2">
+                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b mb-2 text-teal-600">Task In Progress</h2>
                                                     {inProgressTasks.map((task, index) => (
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                                             {(provided) => (
-                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
+                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200 bg-blue-50 rounded-md">
                                                                     <div className="flex items-center justify-end gap-0.5">
                                                                         <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
                                                                             <MdDelete />
@@ -305,8 +310,11 @@ const Home = () => {
                                                                             <FaRegEdit />
                                                                         </button>
                                                                     </div>
-                                                                    <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                                    <p className="text-sm text-gray-500">{task.description}</p>
+                                                                    <div>
+                                                                        <h2 className="text-lg font-semibold">{task.title}</h2>
+                                                                        <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+                                                                        <p className=" text-xs text-gray-400 font-semibold mt-auto italic">Uploaded: {new Date(task.postedTime).toLocaleString()}</p>
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </Draggable>
@@ -319,12 +327,12 @@ const Home = () => {
                                         {/* Done Column */}
                                         <Droppable droppableId="done" type="group">
                                             {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-green-400 h-full">
-                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b">Task Done</h2>
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 h-full bg-blue-100 p-2">
+                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b mb-2 text-teal-600">Task Done</h2>
                                                     {doneTasks.map((task, index) => (
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                                             {(provided) => (
-                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
+                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200 bg-blue-50 rounded-md">
                                                                     <div className="flex items-center justify-end gap-0.5">
                                                                         <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
                                                                             <MdDelete />
@@ -333,8 +341,11 @@ const Home = () => {
                                                                             <FaRegEdit />
                                                                         </button>
                                                                     </div>
-                                                                    <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                                    <p className="text-sm text-gray-500">{task.description}</p>
+                                                                    <div>
+                                                                        <h2 className="text-lg font-semibold">{task.title}</h2>
+                                                                        <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+                                                                        <p className=" text-xs text-gray-400 font-semibold mt-auto italic">Uploaded: {new Date(task.postedTime).toLocaleString()}</p>
+                                                                    </div>
                                                                 </div>
                                                             )}
                                                         </Draggable>
@@ -348,6 +359,8 @@ const Home = () => {
                                 </div>
                             </div>
                         </div>
+
+
                         :
                         <div>
                             <div className="flex flex-col justify-center items-center mt-16 mb-8">
@@ -363,45 +376,47 @@ const Home = () => {
                             </div>
                         </div>
                     }
+
                 </div>
-
-
-                {/* Show Modal */}
-                <dialog id="addTask" className="modal" aria-modal="true">
-                    <div className="modal-box">
-                        <h3 className="font-bold text-xl text-center">Edit Your Task</h3>
-                        <form onSubmit={handleEdit} className="w-full space-y-4">
-                            {/* Title Field */}
-                            <div>
-                                <label className="block">Title</label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    placeholder="Enter title"
-                                    defaultValue={editTask.title}
-                                    className="input input-bordered w-full"
-                                />
-                            </div>
-
-                            {/* Description Field */}
-                            <div>
-                                <label className="block">Description</label>
-                                <textarea
-                                    placeholder="Enter description"
-                                    name="description"
-                                    defaultValue={editTask.description}
-                                    className="textarea w-full"
-                                />
-                            </div>
-
-                            <button type="submit" className="btn btn-sm border border-green-500 mt-1 text-green-700">Update Task</button>
-                        </form>
-                        <div className="flex justify-end">
-                            <button onClick={closeModal} className="btn btn-sm border border-red-600 text-primary">X</button>
-                        </div>
-                    </div>
-                </dialog>
             </DragDropContext>
+
+
+            {/* Show Modal */}
+            <dialog id="addTask" className="modal" aria-modal="true">
+                <div className="modal-box">
+                    <h3 className="font-bold text-xl text-center">Edit Your Task</h3>
+                    <form onSubmit={handleEdit} className="w-full space-y-4">
+                        {/* Title Field */}
+                        <div>
+                            <label className="block">Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                placeholder="Enter title"
+                                defaultValue={editTask.title}
+                                className="input input-bordered w-full"
+                            />
+                        </div>
+
+                        {/* Description Field */}
+                        <div>
+                            <label className="block">Description</label>
+                            <textarea
+                                placeholder="Enter description"
+                                name="description"
+                                defaultValue={editTask.description}
+                                className="textarea w-full"
+                            />
+                        </div>
+
+                        <button type="submit" className="btn btn-sm border border-green-500 mt-1 text-green-700">Update Task</button>
+                    </form>
+                    <div className="flex justify-end">
+                        <button onClick={closeModal} className="btn btn-sm border border-red-600 text-primary">X</button>
+                    </div>
+                </div>
+            </dialog>
+
         </div>
     );
 };
