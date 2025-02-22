@@ -11,7 +11,7 @@ import { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Home = () => {
-    const { user } = useAuth();
+    const { user, dayTheme } = useAuth();
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const axiosPublic = useAxiosPublic();
     const [editTask, setEditTask] = useState({});
@@ -74,6 +74,7 @@ const Home = () => {
             const taskRes = await axiosPublic.patch(`/tasks/${editTask._id}`, updatedTask);
             if (taskRes.data.modifiedCount > 0) {
                 toast.success("Task Updated Successfully");
+                setEditTask({})
                 refetch(); // Refetch tasks to update the UI
                 closeModal(); // Close the modal
             } else {
@@ -210,7 +211,7 @@ const Home = () => {
 
                                 {/* Create a Task */}
                                 <div className="">
-                                    <form onSubmit={handleSubmit(handleTaskSubmit)} className="w-full flex flex-col md:flex-row items-start md:items-center gap-2">
+                                    <form onSubmit={handleSubmit(handleTaskSubmit)} className={`w-full flex flex-col md:flex-row items-start md:items-center gap-2 ${!dayTheme && 'text-teal-500'}`}>
                                         {/* Title */}
                                         <div className="flex items-center gap-1 w-full">
                                             <label className="block">Title</label>
@@ -265,7 +266,7 @@ const Home = () => {
                                         {/* To Do Column */}
                                         <Droppable droppableId="todo" type="group">
                                             {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 h-full bg-blue-100 p-2">
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 h-full bg-blue-100 rounded-md p-2">
                                                     <h2 className="text-center text-2xl font-semibold p-2 border-b mb-2 text-teal-600">Task to Do</h2>
                                                     {todoTasks.map((task, index) => (
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
@@ -296,7 +297,7 @@ const Home = () => {
                                         {/* In Progress Column */}
                                         <Droppable droppableId="inProgress" type="group">
                                             {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 bg-blue-100 h-full shadow p-2">
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 bg-blue-100 h-full shadow rounded-md p-2">
                                                     <h2 className="text-center text-2xl font-semibold p-2 border-b mb-2 text-teal-600">Task In Progress</h2>
                                                     {inProgressTasks.map((task, index) => (
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
@@ -327,7 +328,7 @@ const Home = () => {
                                         {/* Done Column */}
                                         <Droppable droppableId="done" type="group">
                                             {(provided) => (
-                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 h-full bg-blue-100 p-2">
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-blue-300 h-full bg-blue-100 rounded-md p-2">
                                                     <h2 className="text-center text-2xl font-semibold p-2 border-b mb-2 text-teal-600">Task Done</h2>
                                                     {doneTasks.map((task, index) => (
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
@@ -369,7 +370,7 @@ const Home = () => {
                                 <h2 className="text-4xl font-bold text-teal-600 flex">Taskify</h2>
                             </div>
                             <div>
-                                <p className="text-2xl font-semibold text-center italic text-gray-600">Effortless Task Management – Anytime, Anywhere</p>
+                                <p className={`text-2xl font-semibold text-center italic ${dayTheme ? 'text-gray-600' : 'text-gray-300'}`}>Effortless Task Management – Anytime, Anywhere</p>
                                 <div className="flex justify-center mt-4">
                                     <SocialLogin></SocialLogin>
                                 </div>

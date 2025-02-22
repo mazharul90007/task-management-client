@@ -7,23 +7,32 @@ const SocialLogin = () => {
     const { googleSignUp } = useAuth();
     const axiosPublic = useAxiosPublic();
 
-    const handleGoogleSignUp = () => {
-        googleSignUp()
-            .then(result => {
-                const userInfo = {
-                    email: result.user?.email,
-                    name: result.user?.displayName,
-                };
-                return axiosPublic.post('/users', userInfo);
-            })
-            .then(() => {
-                // console.log(res.data);
-                
-            })
-            .catch(() => {
-                // console.error(error);
-                toast.error("Google sign-in failed. Please try again.");
-            });
+    const handleGoogleSignUp = async () => {
+        try {
+            // Sign in with Google
+            const result = await googleSignUp();
+
+            // Prepare user data
+            const userInfo = {
+                email: result.user?.email,
+                name: result.user?.displayName,
+                uid: result.user?.uid,
+            };
+
+            // Send user data to the backend
+            const res = await axiosPublic.post("/users", userInfo);
+
+            // Check if the user was successfully stored in the database
+            if (res.data.insertedId) {
+                toast.success("Login successful!");
+                // console.log("Registration successful");
+            } else {
+                toast.error("Failed to store user details.");
+            }
+        } catch (error) {
+            console.error("Google sign-in failed:", error);
+            toast.error("Google sign-in failed. Please try again.");
+        }
     };
 
     return (
