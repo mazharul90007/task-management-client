@@ -11,21 +11,13 @@ import { useEffect, useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const Home = () => {
-    const { user, setUser, logOut } = useAuth();
+    const { user } = useAuth();
     const { register, handleSubmit, reset, formState: { errors } } = useForm();
     const axiosPublic = useAxiosPublic();
     const [editTask, setEditTask] = useState({});
     const [stores, setStores] = useState([]);
 
-    const handleLogOut = () => {
-        logOut()
-            .then(() => {
-                setUser(null);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    };
+    
 
     // Get data based on email
     const { data: allTasks = [], refetch } = useQuery({
@@ -74,7 +66,7 @@ const Home = () => {
             title: title,
             description: description
         };
-        console.log(updatedTask)
+        // console.log(updatedTask)
 
         try {
             const taskRes = await axiosPublic.patch(`/tasks/${editTask._id}`, updatedTask);
@@ -93,7 +85,7 @@ const Home = () => {
 
     // Post a new task
     const handleTaskSubmit = async (data) => {
-        console.log(data)
+        // console.log(data)
         try {
             const taskInfo = {
                 title: data.title,
@@ -103,10 +95,10 @@ const Home = () => {
                 email: user.email
             };
     
-            console.log("Form Data:", taskInfo); // Debugging
+            // console.log("Form Data:", taskInfo); // Debugging
     
             const taskRes = await axiosPublic.post('/tasks', taskInfo);
-            console.log("Backend Response:", taskRes); // Debugging
+            // console.log("Backend Response:", taskRes); // Debugging
     
             if (taskRes.data.insertedId) {
                 toast.success("Task Submission Successful");
@@ -156,8 +148,8 @@ const Home = () => {
     const handleDragDrop = async (results) => {
         const { source, destination } = results;
 
-        console.log("Source:", source);
-        console.log("Destination:", destination);
+        // console.log("Source:", source);
+        // console.log("Destination:", destination);
 
         // If there's no destination or the task is dropped in the same position, do nothing
         if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
@@ -206,7 +198,6 @@ const Home = () => {
         <div>
             <div className="flex gap-2 items-center justify-end">
                 <SocialLogin></SocialLogin>
-                <button onClick={handleLogOut} className="btn btn-success">LogOut</button>
             </div>
             <div className="text-center">
                 <h3 className="text-3xl font-semibold text-teal-600">Your Daily Task</h3>
