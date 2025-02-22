@@ -48,6 +48,40 @@ This Task Management Application allows users to manage their tasks efficiently 
 - **MongoDB + Mongoose** (for database management)
 - **WebSockets** (for real-time updates)
 
+## Dependencies
+### Project Dependencies:
+- `@tailwindcss/vite` ^4.0.7
+- `@tanstack/react-query` ^5.66.8
+- `axios` ^1.7.9
+- `firebase` ^11.3.1
+- `localforage` ^1.10.0
+- `match-sorter` ^8.0.0
+- `prop-types` ^15.8.1
+- `react` ^18.2.0
+- `react-beautiful-dnd` ^13.1.1
+- `react-dom` ^18.2.0
+- `react-firebase-hooks` ^5.1.1
+- `react-hook-form` ^7.54.2
+- `react-icons` ^5.5.0
+- `react-router-dom` ^7.2.0
+- `react-toastify` ^11.0.3
+- `sort-by` ^1.2.0
+- `sweetalert2` ^11.17.2
+- `tailwindcss` ^4.0.7
+
+### Development Dependencies:
+- `@eslint/js` ^9.19.0
+- `@types/react` ^19.0.8
+- `@types/react-dom` ^19.0.3
+- `@vitejs/plugin-react` ^4.3.4
+- `daisyui` ^5.0.0-beta.8
+- `eslint` ^9.19.0
+- `eslint-plugin-react` ^7.37.4
+- `eslint-plugin-react-hooks` ^5.0.0
+- `eslint-plugin-react-refresh` ^0.4.18
+- `globals` ^15.14.0
+- `vite` ^6.1.0
+
 ## Installation Steps
 1. **Clone the repository**:
    ```sh
