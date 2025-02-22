@@ -272,17 +272,22 @@ const Home = () => {
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                                             {(provided) => (
                                                                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200 bg-blue-50 rounded-md">
-                                                                    <div className="flex items-center justify-end gap-0.5">
-                                                                        <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
-                                                                            <MdDelete />
-                                                                        </button>
-                                                                        <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
-                                                                            <FaRegEdit />
-                                                                        </button>
+                                                                    <div className="flex justify-between items-center mb-2">
+                                                                        <div className="py-0.5 px-3 rounded bg-red-100 text-xs border border-red-300 italic text-gray-500 font-semibold">
+                                                                            <p>{task.category.toUpperCase()}</p>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-end gap-0.5">
+                                                                            <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer shadow-md hover:scale-95 transition-transform transform">
+                                                                                <MdDelete />
+                                                                            </button>
+                                                                            <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer shadow-md hover:scale-95 transition-transform transform">
+                                                                                <FaRegEdit />
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                     <div>
                                                                         <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                                        <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+                                                                        <p className=" text-gray-500 mb-3">{task.description}</p>
                                                                         <p className=" text-xs text-gray-400 font-semibold mt-auto italic">Uploaded: {new Date(task.postedTime).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
@@ -303,17 +308,22 @@ const Home = () => {
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                                             {(provided) => (
                                                                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200 bg-blue-50 rounded-md">
-                                                                    <div className="flex items-center justify-end gap-0.5">
-                                                                        <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
-                                                                            <MdDelete />
-                                                                        </button>
-                                                                        <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
-                                                                            <FaRegEdit />
-                                                                        </button>
+                                                                    <div className="flex justify-between items-center mb-2">
+                                                                        <div className="py-0.5 px-3 rounded bg-amber-100 text-xs border border-amber-300 italic text-gray-500 font-semibold">
+                                                                            <p>{task.category.toUpperCase()}</p>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-end gap-0.5">
+                                                                            <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer shadow-md hover:scale-95 transition-transform transform">
+                                                                                <MdDelete />
+                                                                            </button>
+                                                                            <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer shadow-md hover:scale-95 transition-transform transform">
+                                                                                <FaRegEdit />
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                     <div>
                                                                         <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                                        <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+                                                                        <p className=" text-gray-500 mb-3">{task.description}</p>
                                                                         <p className=" text-xs text-gray-400 font-semibold mt-auto italic">Uploaded: {new Date(task.postedTime).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
@@ -334,17 +344,22 @@ const Home = () => {
                                                         <Draggable key={task._id} draggableId={task._id} index={index}>
                                                             {(provided) => (
                                                                 <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200 bg-blue-50 rounded-md">
-                                                                    <div className="flex items-center justify-end gap-0.5">
-                                                                        <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
-                                                                            <MdDelete />
-                                                                        </button>
-                                                                        <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
-                                                                            <FaRegEdit />
-                                                                        </button>
+                                                                    <div className="flex justify-between items-center mb-2">
+                                                                        <div className="py-0.5 px-3 rounded bg-green-100 text-xs border border-green-300 italic text-gray-500 font-semibold">
+                                                                            <p>{task.category.toUpperCase()}</p>
+                                                                        </div>
+                                                                        <div className="flex items-center justify-end gap-0.5">
+                                                                            <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer shadow-md hover:scale-95 transition-transform transform">
+                                                                                <MdDelete />
+                                                                            </button>
+                                                                            <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer shadow-md hover:scale-95 transition-transform transform">
+                                                                                <FaRegEdit />
+                                                                            </button>
+                                                                        </div>
                                                                     </div>
                                                                     <div>
                                                                         <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                                        <p className="text-sm text-gray-500 mb-3">{task.description}</p>
+                                                                        <p className=" text-gray-500 mb-3">{task.description}</p>
                                                                         <p className=" text-xs text-gray-400 font-semibold mt-auto italic">Uploaded: {new Date(task.postedTime).toLocaleString()}</p>
                                                                     </div>
                                                                 </div>
