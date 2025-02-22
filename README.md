@@ -1,7 +1,7 @@
 # Task Management Application
 
 ## Live Link
-# [Taskify](https://task-management-48e66.web.app/)
+## [Taskify](https://task-management-48e66.web.app/)
 
 ## Description
 This Task Management Application allows users to manage their tasks efficiently by adding, editing, deleting, and reordering them using a drag-and-drop interface. The tasks are categorized into three sections: **To-Do, In Progress, and Done**. Changes are instantly saved to the database for persistence. Only authenticated users can access the application via **Firebase Authentication**.
@@ -93,7 +93,7 @@ project-root/
 - Add user settings for customizing the UI.
 
 ## Author
-Developed by **Your Name**.
+Developed by **Mazharul Islam Sourabh**.
 
 ---
 
