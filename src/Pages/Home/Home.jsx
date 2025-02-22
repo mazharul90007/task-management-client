@@ -17,30 +17,31 @@ const Home = () => {
     const [editTask, setEditTask] = useState({});
     const [stores, setStores] = useState([]);
 
-    
+
 
     // Get data based on email
     const { data: allTasks = [], refetch } = useQuery({
-        queryKey: ["todoTasks", user?.email],
+        queryKey: ["allTasks", user?.email],
         queryFn: async () => {
             if (!user?.email) return [];
             const res = await axiosPublic.get('/tasks', {
                 params: { email: user?.email }
             });
-            // setStores(allTasks);
+            setStores(res.data);
             return res.data;
-            
+
         },
         enabled: !!user?.email,
     });
 
-    useEffect(() => {
-        setStores(allTasks);
-    }, [allTasks]);
+    // useEffect(() => {
+    //     setStores(allTasks);
+    // }, [allTasks]);
+    // setStores(allTasks);
 
-    const todoTasks = stores.filter(task => task.category === 'todo');
-    const inProgressTasks = stores.filter(task => task.category === 'inProgress');
-    const doneTasks = stores.filter(task => task.category === 'done');
+    const todoTasks = stores?.filter(task => task.category === 'todo');
+    const inProgressTasks = stores?.filter(task => task.category === 'inProgress');
+    const doneTasks = stores?.filter(task => task.category === 'done');
 
     const openModal = () => {
         document.getElementById('addTask')?.showModal();
@@ -94,18 +95,18 @@ const Home = () => {
                 postedTime: Date.now(),
                 email: user.email
             };
-    
+
             // console.log("Form Data:", taskInfo); // Debugging
-    
+
             const taskRes = await axiosPublic.post('/tasks', taskInfo);
             // console.log("Backend Response:", taskRes); // Debugging
-    
+
             if (taskRes.data.insertedId) {
                 toast.success("Task Submission Successful");
-                refetch().then(()=>{
-                    reset(); 
-                }); 
-                
+                refetch().then(() => {
+                    reset();
+                });
+
             } else {
                 toast.error("Something went wrong!");
             }
@@ -146,42 +147,38 @@ const Home = () => {
     // ------------Handle Drag and Drop-------------------
 
     const handleDragDrop = async (results) => {
-        const { source, destination } = results;
+        const { source, destination, draggableId } = results;
+        console.log(results)
 
-        // console.log("Source:", source);
-        // console.log("Destination:", destination);
-
-        // If there's no destination or the task is dropped in the same position, do nothing
+        // If there's no destination or task is dropped in the same position, do nothing
         if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) return;
 
+        // Clone stores to avoid modifying state directly
         const reorderedStores = [...stores];
 
         // Find the task being moved
-        const task = reorderedStores.find((task) => task._id === results.draggableId);
+        const task = reorderedStores.find((task) => task._id === draggableId);
+        if (!task) return; // Prevent errors if the task is not found
 
         if (source.droppableId === destination.droppableId) {
             // Reorder tasks within the same column
-            const filteredTasks = reorderedStores.filter((task) => task.category === source.droppableId);
+            const filteredTasks = reorderedStores.filter((t) => t.category === source.droppableId);
             const [removedTask] = filteredTasks.splice(source.index, 1);
             filteredTasks.splice(destination.index, 0, removedTask);
 
-            // Update the stores array with the new order
-            const updatedStores = reorderedStores.map((task) => {
-                if (task.category === source.droppableId) {
-                    return filteredTasks.shift();
-                }
-                return task;
-            });
+            // Create a new stores array
+            const updatedStores = reorderedStores.map((t) =>
+                t.category === source.droppableId ? filteredTasks.shift() : t
+            );
 
             setStores(updatedStores);
         } else {
             // Move task to a different column
-            task.category = destination.droppableId; // Update the task's category
-
-            // Update the stores array
+            const updatedTask = { ...task, category: destination.droppableId };
             const updatedStores = reorderedStores.map((t) =>
-                t._id === task._id ? { ...t, category: destination.droppableId } : t
+                t._id === task._id ? updatedTask : t
             );
+
             setStores(updatedStores);
 
             // Update the task in the database
@@ -194,193 +191,217 @@ const Home = () => {
         }
     };
 
+
     return (
         <div>
-            <div className="flex gap-2 items-center justify-end">
-                <SocialLogin></SocialLogin>
-            </div>
-            <div className="text-center">
-                <h3 className="text-3xl font-semibold text-teal-600">Your Daily Task</h3>
-            </div>
-
-            {/* Create a Task */}
-            <div className="w-11/12 mx-auto">
-                <form onSubmit={handleSubmit(handleTaskSubmit)} className="w-full flex items-center gap-2">
-                    {/* Title */}
-                    <div className="flex items-center gap-1">
-                        <label className="block">Title</label>
-                        <input
-                            type="text"
-                            placeholder="Enter title"
-                            {...register('title', {
-                                required: "Title is required",
-                                maxLength: { value: 50, message: "Title cannot exceed 50 characters" }
-                            })}
-                            className="input input-bordered w-full"
-                        />
-                        {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
-                    </div>
-
-                    {/* Description */}
-                    <div className="flex items-center gap-1">
-                        <label className="block">Description</label>
-                        <input
-                            type="text"
-                            placeholder="Enter description"
-                            {...register('description', {
-                                required: "Description is required",
-                                maxLength: { value: 200, message: "Description cannot exceed 200 characters" }
-                            })}
-                            className="input input-bordered w-full"
-                        />
-                        {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
-                    </div>
-
-                    {/* Category */}
-                    <div className="flex items-center gap-1">
-                        <label className="block">Category</label>
-                        <select defaultValue='default' {...register('category', { required: true })} className="select select-bordered w-full">
-                            <option disabled value="default">Category</option>
-                            <option value="todo">To Do</option>
-                            <option value="inProgress">In Progress</option>
-                            <option value="done">Done</option>
-                        </select>
-                    </div>
-
-                    <button className="btn btn-sm border border-green-500 text-green-700">Post</button>
-                </form>
-            </div>
-
-            {/* Display Card Section */}
             <DragDropContext onDragEnd={handleDragDrop}>
+                {/* Display Card Section */}
                 <div className="w-11/12 mx-auto">
-                    {user?.email ? (
-                        <div className="grid md:grid-cols-3 gap-2 mt-16 h-full">
-                            {/* To Do Column */}
-                            <Droppable droppableId="todo" type="group">
-                                {(provided) => (
-                                    <div ref={provided.innerRef} {...provided.droppableProps} className="border border-red-400 h-full">
-                                        <h2 className="text-center text-2xl font-semibold p-2 border-b">Task to Do</h2>
-                                        {todoTasks.map((task, index) => (
-                                            <Draggable key={task._id} draggableId={task._id} index={index}>
-                                                {(provided) => (
-                                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
-                                                        <div className="flex items-center justify-end gap-0.5">
-                                                            <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
-                                                                <MdDelete />
-                                                            </button>
-                                                            <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
-                                                                <FaRegEdit />
-                                                            </button>
-                                                        </div>
-                                                        <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                        <p className="text-sm text-gray-500">{task.description}</p>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
+                    {user?.email ?
 
-                            {/* In Progress Column */}
-                            <Droppable droppableId="inProgress" type="group">
-                                {(provided) => (
-                                    <div ref={provided.innerRef} {...provided.droppableProps} className="border border-yellow-400 h-full">
-                                        <h2 className="text-center text-2xl font-semibold p-2 border-b">Task In Progress</h2>
-                                        {inProgressTasks.map((task, index) => (
-                                            <Draggable key={task._id} draggableId={task._id} index={index}>
-                                                {(provided) => (
-                                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
-                                                        <div className="flex items-center justify-end gap-0.5">
-                                                            <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
-                                                                <MdDelete />
-                                                            </button>
-                                                            <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
-                                                                <FaRegEdit />
-                                                            </button>
-                                                        </div>
-                                                        <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                        <p className="text-sm text-gray-500">{task.description}</p>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                    </div>
-                                )}
-                            </Droppable>
+                        <div>
+                            {/* Description */}
+                            <div>
+                                <div className="text-center">
+                                    <h3 className="text-3xl font-semibold text-teal-600">Your Daily Task</h3>
+                                </div>
 
-                            {/* Done Column */}
-                            <Droppable droppableId="done" type="group">
-                                {(provided) => (
-                                    <div ref={provided.innerRef} {...provided.droppableProps} className="border border-green-400 h-full">
-                                        <h2 className="text-center text-2xl font-semibold p-2 border-b">Task Done</h2>
-                                        {doneTasks.map((task, index) => (
-                                            <Draggable key={task._id} draggableId={task._id} index={index}>
-                                                {(provided) => (
-                                                    <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
-                                                        <div className="flex items-center justify-end gap-0.5">
-                                                            <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
-                                                                <MdDelete />
-                                                            </button>
-                                                            <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
-                                                                <FaRegEdit />
-                                                            </button>
-                                                        </div>
-                                                        <h2 className="text-lg font-semibold">{task.title}</h2>
-                                                        <p className="text-sm text-gray-500">{task.description}</p>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
+                                {/* Create a Task */}
+                                <div className="w-11/12 mx-auto">
+                                    <form onSubmit={handleSubmit(handleTaskSubmit)} className="w-full flex items-center gap-2">
+                                        {/* Title */}
+                                        <div className="flex items-center gap-1">
+                                            <label className="block">Title</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter title"
+                                                {...register('title', {
+                                                    required: "Title is required",
+                                                    maxLength: { value: 50, message: "Title cannot exceed 50 characters" }
+                                                })}
+                                                className="input input-bordered w-full"
+                                            />
+                                            {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
+                                        </div>
+
+                                        {/* Description */}
+                                        <div className="flex items-center gap-1">
+                                            <label className="block">Description</label>
+                                            <input
+                                                type="text"
+                                                placeholder="Enter description"
+                                                {...register('description', {
+                                                    required: "Description is required",
+                                                    maxLength: { value: 200, message: "Description cannot exceed 200 characters" }
+                                                })}
+                                                className="input input-bordered w-full"
+                                            />
+                                            {errors.description && <p className="text-red-500 text-sm">{errors.description.message}</p>}
+                                        </div>
+
+                                        {/* Category */}
+                                        <div className="flex items-center gap-1">
+                                            <label className="block">Category</label>
+                                            <select defaultValue='default' {...register('category', { required: true })} className="select select-bordered w-full">
+                                                <option disabled value="default">Category</option>
+                                                <option value="todo">To Do</option>
+                                                <option value="inProgress">In Progress</option>
+                                                <option value="done">Done</option>
+                                            </select>
+                                        </div>
+
+                                        <button className="btn btn-sm border border-green-500 text-green-700">Post</button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div>
+                                {/* Task Container */}
+                                <div className="w-11/12 mx-auto">
+
+                                    <div className="grid md:grid-cols-3 gap-2 mt-16 h-full">
+                                        {/* To Do Column */}
+                                        <Droppable droppableId="todo" type="group">
+                                            {(provided) => (
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-red-400 h-full">
+                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b">Task to Do</h2>
+                                                    {todoTasks.map((task, index) => (
+                                                        <Draggable key={task._id} draggableId={task._id} index={index}>
+                                                            {(provided) => (
+                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
+                                                                    <div className="flex items-center justify-end gap-0.5">
+                                                                        <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
+                                                                            <MdDelete />
+                                                                        </button>
+                                                                        <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
+                                                                            <FaRegEdit />
+                                                                        </button>
+                                                                    </div>
+                                                                    <h2 className="text-lg font-semibold">{task.title}</h2>
+                                                                    <p className="text-sm text-gray-500">{task.description}</p>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+
+                                        {/* In Progress Column */}
+                                        <Droppable droppableId="inProgress" type="group">
+                                            {(provided) => (
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-yellow-400 h-full">
+                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b">Task In Progress</h2>
+                                                    {inProgressTasks.map((task, index) => (
+                                                        <Draggable key={task._id} draggableId={task._id} index={index}>
+                                                            {(provided) => (
+                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
+                                                                    <div className="flex items-center justify-end gap-0.5">
+                                                                        <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
+                                                                            <MdDelete />
+                                                                        </button>
+                                                                        <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
+                                                                            <FaRegEdit />
+                                                                        </button>
+                                                                    </div>
+                                                                    <h2 className="text-lg font-semibold">{task.title}</h2>
+                                                                    <p className="text-sm text-gray-500">{task.description}</p>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+
+                                        {/* Done Column */}
+                                        <Droppable droppableId="done" type="group">
+                                            {(provided) => (
+                                                <div ref={provided.innerRef} {...provided.droppableProps} className="border border-green-400 h-full">
+                                                    <h2 className="text-center text-2xl font-semibold p-2 border-b">Task Done</h2>
+                                                    {doneTasks.map((task, index) => (
+                                                        <Draggable key={task._id} draggableId={task._id} index={index}>
+                                                            {(provided) => (
+                                                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps} className="p-2 border mb-1 shadow border-gray-200">
+                                                                    <div className="flex items-center justify-end gap-0.5">
+                                                                        <button onClick={() => handleDelete(task._id)} className="border p-1 rounded bg-red-50 text-red-500 cursor-pointer">
+                                                                            <MdDelete />
+                                                                        </button>
+                                                                        <button onClick={() => handleEditButton(task)} className="border p-1 rounded bg-green-50 text-green-500 cursor-pointer">
+                                                                            <FaRegEdit />
+                                                                        </button>
+                                                                    </div>
+                                                                    <h2 className="text-lg font-semibold">{task.title}</h2>
+                                                                    <p className="text-sm text-gray-500">{task.description}</p>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
                                     </div>
-                                )}
-                            </Droppable>
+
+                                </div>
+                            </div>
                         </div>
-                    ) : (
-                        <div></div>
-                    )}
+                        :
+                        <div>
+                            <div className="flex flex-col justify-center items-center mt-16 mb-8">
+                                <h2 className="text-3xl font-semibold text-teal-600 flex">Hi..! Welcome</h2>
+                                <p className="text-xl font-semibold text-teal-500 flex">to</p>
+                                <h2 className="text-4xl font-bold text-teal-600 flex">Taskify</h2>
+                            </div>
+                            <div>
+                                <p className="text-2xl font-semibold text-center italic text-gray-600">Effortless Task Management – Anytime, Anywhere</p>
+                                <div className="flex justify-center mt-4">
+                                    <SocialLogin></SocialLogin>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
-            </DragDropContext>
 
-            {/* Show Modal */}
-            <dialog id="addTask" className="modal" aria-modal="true">
-                <div className="modal-box">
-                    <h3 className="font-bold text-xl text-center">Edit Your Task</h3>
-                    <form onSubmit={handleEdit} className="w-full space-y-4">
-                        {/* Title Field */}
-                        <div>
-                            <label className="block">Title</label>
-                            <input
-                                type="text"
-                                name="title"
-                                placeholder="Enter title"
-                                defaultValue={editTask.title}
-                                className="input input-bordered w-full"
-                            />
+
+                {/* Show Modal */}
+                <dialog id="addTask" className="modal" aria-modal="true">
+                    <div className="modal-box">
+                        <h3 className="font-bold text-xl text-center">Edit Your Task</h3>
+                        <form onSubmit={handleEdit} className="w-full space-y-4">
+                            {/* Title Field */}
+                            <div>
+                                <label className="block">Title</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    placeholder="Enter title"
+                                    defaultValue={editTask.title}
+                                    className="input input-bordered w-full"
+                                />
+                            </div>
+
+                            {/* Description Field */}
+                            <div>
+                                <label className="block">Description</label>
+                                <textarea
+                                    placeholder="Enter description"
+                                    name="description"
+                                    defaultValue={editTask.description}
+                                    className="textarea w-full"
+                                />
+                            </div>
+
+                            <button type="submit" className="btn btn-sm border border-green-500 mt-1 text-green-700">Update Task</button>
+                        </form>
+                        <div className="flex justify-end">
+                            <button onClick={closeModal} className="btn btn-sm border border-red-600 text-primary">X</button>
                         </div>
-
-                        {/* Description Field */}
-                        <div>
-                            <label className="block">Description</label>
-                            <textarea
-                                placeholder="Enter description"
-                                name="description"
-                                defaultValue={editTask.description}
-                                className="textarea w-full"
-                            />
-                        </div>
-
-                        <button type="submit" className="btn btn-sm border border-green-500 mt-1 text-green-700">Update Task</button>
-                    </form>
-                    <div className="flex justify-end">
-                        <button onClick={closeModal} className="btn btn-sm border border-red-600 text-primary">X</button>
                     </div>
-                </div>
-            </dialog>
+                </dialog>
+            </DragDropContext>
         </div>
     );
 };
