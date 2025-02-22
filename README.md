@@ -1,7 +1,7 @@
 # Task Management Application
 
 ## Live Link
-[Click here to view the live application](#)
+# [Taskify](https://task-management-48e66.web.app/)
 
 ## Description
 This Task Management Application allows users to manage their tasks efficiently by adding, editing, deleting, and reordering them using a drag-and-drop interface. The tasks are categorized into three sections: **To-Do, In Progress, and Done**. Changes are instantly saved to the database for persistence. Only authenticated users can access the application via **Firebase Authentication**.
@@ -51,7 +51,7 @@ This Task Management Application allows users to manage their tasks efficiently 
 ## Installation Steps
 1. **Clone the repository**:
    ```sh
-   git clone https://github.com/yourusername/task-management.git
+   git clone https://github.com/mazharul90007/task-management-client.git
    cd task-management
    ```
 2. **Install dependencies**:
@@ -65,6 +65,10 @@ This Task Management Application allows users to manage their tasks efficiently 
 4. **Set up the Backend**:
    - Configure MongoDB connection.
    - Run the backend server:
+   ```sh
+   git clone https://github.com/mazharul90007/task-management-server.git
+   cd task-management-server
+   ```
      ```sh
      npm run server
      ```
